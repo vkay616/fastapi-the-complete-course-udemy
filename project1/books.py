@@ -161,3 +161,10 @@ def search_book_by_query(search: str):
 @app.post("/books/add_book")
 def add_book(new_book = Body()):
     BOOKS.append(new_book)
+
+
+@app.put("/books/update_book")
+def update_book(updated_book = Body()):
+    for i in range(len(BOOKS)):
+        if BOOKS[i].get("id") == updated_book.get("id"):
+            BOOKS[i] = updated_book
