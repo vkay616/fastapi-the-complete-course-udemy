@@ -168,3 +168,11 @@ def update_book(updated_book = Body()):
     for i in range(len(BOOKS)):
         if BOOKS[i].get("id") == updated_book.get("id"):
             BOOKS[i] = updated_book
+
+
+@app.delete("/books/delete_book/{book_id}")
+def delete_book(book_id: int):
+    for i in range(len(BOOKS)):
+        if BOOKS[i].get("id") == book_id:
+            BOOKS.pop(i)
+            break
