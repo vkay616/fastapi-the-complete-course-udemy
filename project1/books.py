@@ -147,3 +147,12 @@ def get_book(book_id: int):
     for book in BOOKS:
         if book.get("id") == book_id:
             return book
+        
+
+@app.get("/books/")
+def search_book_by_query(search: str):
+    b = []
+    for book in BOOKS:
+        if search.casefold() in book.get("title").casefold() or search.casefold() in book.get("author").casefold():
+            b.append(book)
+    return b
