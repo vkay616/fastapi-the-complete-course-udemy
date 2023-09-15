@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Body
 
 app = FastAPI()
 
@@ -156,3 +156,8 @@ def search_book_by_query(search: str):
         if search.casefold() in book.get("title").casefold() or search.casefold() in book.get("author").casefold():
             b.append(book)
     return b
+
+
+@app.post("/books/add_book")
+def add_book(new_book = Body()):
+    BOOKS.append(new_book)
