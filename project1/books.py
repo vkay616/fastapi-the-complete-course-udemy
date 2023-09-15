@@ -138,5 +138,12 @@ BOOKS = [
 ]
 
 @app.get("/books")
-async def get_all_books():
+def get_all_books():
     return BOOKS
+
+
+@app.get("/books/{book_id}")
+def get_book(book_id: int):
+    for book in BOOKS:
+        if book.get("id") == book_id:
+            return book
