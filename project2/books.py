@@ -26,6 +26,16 @@ class BookRequest(BaseModel):
     description: str
     rating: int = Field(gt=-1, lt=11)
 
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "title": "Book Title",
+                "author": "Author's Name",
+                "description": "Description of the Book",
+                "rating": 5
+            }
+        }
+
 
 
 BOOKS = [
@@ -41,15 +51,33 @@ BOOKS = [
     Book(10, 'Book10', 'Author1', 'Description10', 1)
 ]
 
-@app.get("/books/")
-def get_books():
+@app.get("/books")
+def get_all_books():
     return BOOKS
+
+
+@app.get("/books/{book_id}")
+def get_book(book_id: int):
+    for book in BOOKS:
+        if book.id == book_id:
+            return book
+
+
+@app.get("/books/")
+def get_book_by_rating(rating: int):
+    b = []
+    for book in BOOKS:
+        if book.rating == rating:
+            b.append(book)
+    
+    return b
 
 
 @app.post("/add_book/")
 def add_book(requested_book: BookRequest):
     book = Book(**requested_book.model_dump())
     BOOKS.append(create_book_id(book))
+
 
 
 def create_book_id(book: Book):
