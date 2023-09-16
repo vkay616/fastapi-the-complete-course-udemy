@@ -134,4 +134,4 @@ def delete_book(book_id: int = Path(gt=0)):
             book_deleted = True
 
     if not book_deleted:
-        raise HTTPException(status_code=404, detail=f"Book with ID {book.id} does not exists!")
+        raise HTTPException(status_code=404, detail=f"Book with ID {book_id} does not exists!")
