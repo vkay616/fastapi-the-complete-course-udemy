@@ -51,6 +51,15 @@ BOOKS = [
     Book(10, 'Book10', 'Author1', 'Description10', 1)
 ]
 
+def create_book_id(book: Book):
+    if len(BOOKS) > 0:
+        book.id = BOOKS[-1].id + 1
+    else:
+        book.id = 1
+
+    return book
+
+
 @app.get("/books")
 def get_all_books():
     return BOOKS
@@ -73,17 +82,21 @@ def get_book_by_rating(rating: int):
     return b
 
 
-@app.post("/add_book/")
+@app.post("/add_book")
 def add_book(requested_book: BookRequest):
     book = Book(**requested_book.model_dump())
     BOOKS.append(create_book_id(book))
 
 
+@app.put("/books/update_book")
+def update_book(book: BookRequest):
+    for i in range(len(BOOKS)):
+        if BOOKS[i].id == book.id:
+            BOOKS[i] = book
 
-def create_book_id(book: Book):
-    if len(BOOKS) > 0:
-        book.id = BOOKS[-1].id + 1
-    else:
-        book.id = 1
 
-    return book
+@app.delete("/books/delete/{book_id}")
+def delete_book(book_id: int):
+    for i in range(len(BOOKS)):
+        if BOOKS[i].id == book_id:
+            BOOKS.pop(i)
