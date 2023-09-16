@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Path, Query
+from fastapi import FastAPI, Path, Query, HTTPException
 from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
@@ -35,7 +35,7 @@ class BookRequest(BaseModel):
     author: str = Field(min_length=MIN_STRING_LENGTH)
     description: str
     rating: int = Field(gt=-MIN_EXCLUSIVE_RATING, lt=MAX_EXCLUSIVE_RATING)
-    year: int = Field(gt=MIN_ACCEPTED_YEAR, lt=CURRENT_YEAR)
+    year: int = Field(gt=MIN_ACCEPTED_YEAR, lt=CURRENT_YEAR+1)
 
     class Config:
         json_schema_extra = {
@@ -82,6 +82,8 @@ def get_book(book_id: int = Path(gt=0)):
     for book in BOOKS:
         if book.id == book_id:
             return book
+        
+    raise HTTPException(404, detail="Book not found!")
 
 
 @app.get("/books/")
@@ -112,13 +114,23 @@ def add_book(requested_book: BookRequest):
 
 @app.put("/books/update_book")
 def update_book(book: BookRequest):
+    book_updated = False
     for i in range(len(BOOKS)):
         if BOOKS[i].id == book.id:
             BOOKS[i] = book
+            book_updated = True
+
+    if not book_updated:
+        raise HTTPException(status_code=404, detail=f"Book with ID {book.id} does not exists!")
 
 
 @app.delete("/books/delete/{book_id}")
 def delete_book(book_id: int = Path(gt=0)):
+    book_deleted = False
     for i in range(len(BOOKS)):
         if BOOKS[i].id == book_id:
             BOOKS.pop(i)
+            book_deleted = True
+
+    if not book_deleted:
+        raise HTTPException(status_code=404, detail=f"Book with ID {book.id} does not exists!")
