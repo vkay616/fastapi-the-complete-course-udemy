@@ -1,8 +1,16 @@
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, Path, Query
 from pydantic import BaseModel, Field
 from typing import Optional
+from datetime import datetime
 
 app = FastAPI()
+
+MAX_EXCLUSIVE_RATING = 11
+MIN_EXCLUSIVE_RATING = 0
+CURRENT_YEAR = datetime.now().year
+MIN_ACCEPTED_YEAR = 1900
+MIN_STRING_LENGTH = 1
+
 
 class Book:
     id: int
@@ -23,11 +31,11 @@ class Book:
 
 class BookRequest(BaseModel):
     id: Optional[int] = None
-    title: str = Field(min_length=1)
-    author: str = Field(min_length=1)
+    title: str = Field(min_length=MIN_STRING_LENGTH)
+    author: str = Field(min_length=MIN_STRING_LENGTH)
     description: str
-    rating: int = Field(gt=-1, lt=11)
-    year: int = Field(gt=0, lt=2024)
+    rating: int = Field(gt=-MIN_EXCLUSIVE_RATING, lt=MAX_EXCLUSIVE_RATING)
+    year: int = Field(gt=MIN_ACCEPTED_YEAR, lt=CURRENT_YEAR)
 
     class Config:
         json_schema_extra = {
@@ -36,7 +44,7 @@ class BookRequest(BaseModel):
                 "author": "Author's Name",
                 "description": "Description of the Book",
                 "rating": 5,
-                "year": 2023
+                "year": CURRENT_YEAR
             }
         }
 
@@ -70,14 +78,14 @@ def get_all_books():
 
 
 @app.get("/books/{book_id}")
-def get_book(book_id: int):
+def get_book(book_id: int = Path(gt=0)):
     for book in BOOKS:
         if book.id == book_id:
             return book
 
 
 @app.get("/books/")
-def get_book_by_rating(rating: int):
+def get_book_by_rating(rating: int = Query(gt=-MIN_EXCLUSIVE_RATING, lt=MAX_EXCLUSIVE_RATING)):
     b = []
     for book in BOOKS:
         if book.rating == rating:
@@ -87,7 +95,7 @@ def get_book_by_rating(rating: int):
 
 
 @app.get("/books/search/")
-def get_book_by_year(year: int):
+def get_book_by_year(year: int = Query(lt=CURRENT_YEAR+1)):
     b = []
     for book in BOOKS:
         if book.year == year:
@@ -110,7 +118,7 @@ def update_book(book: BookRequest):
 
 
 @app.delete("/books/delete/{book_id}")
-def delete_book(book_id: int):
+def delete_book(book_id: int = Path(gt=0)):
     for i in range(len(BOOKS)):
         if BOOKS[i].id == book_id:
             BOOKS.pop(i)
