@@ -61,3 +61,13 @@ def edit_todo(db: db_dependency, todo_request: TodoRequest, todo_id: int= Path(g
 
         db.add(todo_model)
         db.commit()
+
+
+@app.delete("/todo/delete/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_todo(db: db_dependency, todo_id: int = Path(gt=0)):
+    todo_model = db.query(Todos).filter(Todos.id == todo_id).first()
+    if todo_model is None:
+        raise HTTPException(status_code=404, detail="Todo not found!")
+    else:
+        db.query(Todos).filter(Todos.id == todo_id).delete()
+        db.commit()
