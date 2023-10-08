@@ -43,7 +43,7 @@ def get_user(user: user_dependency, db: db_dependency):
     return user_model
 
 
-@router.put("/user/update", status_code=status.HTTP_202_ACCEPTED)
+@router.put("/user/update_password", status_code=status.HTTP_202_ACCEPTED)
 def update_password(user: user_dependency, db: db_dependency, new_password: str):
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication Failed")
@@ -53,7 +53,26 @@ def update_password(user: user_dependency, db: db_dependency, new_password: str)
     if user_model is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User not found!")
     
-    user_model.hashed_password = bcrypt_context.hash( new_password)
+    user_model.hashed_password = bcrypt_context.hash(new_password)
+
+    db.add(user_model)
+
+    db.commit()
+
+
+
+@router.put("/user/update_phone_number", status_code=status.HTTP_202_ACCEPTED)
+def update_phone_number(user: user_dependency, db: db_dependency, new_number: str):
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication Failed")
+    
+    user_model = db.query(Users).filter(Users.username == user.get("username")).first()
+
+    if user_model is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User not found!")
+    
+
+    user_model.phone_number = new_number
 
     db.add(user_model)
 
