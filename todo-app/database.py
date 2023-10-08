@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-SQLALCHEMY_DATABASE_URL = f'postgresql://postgres:{environ["POSTGRES_PASSWORD"]}@localhost/TodoApplicationDatabase'
+SQLALCHEMY_DATABASE_URL = f'mysql+pymysql://root:{environ["MYSQL_PASSWORD"]}@127.0.0.1:3306/todoapplicationdatabase'
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
