@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-SQLALCHEMY_DATABASE_URL = f'mysql+pymysql://root:{environ["MYSQL_PASSWORD"]}@127.0.0.1:3306/todoapplicationdatabase'
+SQLALCHEMY_DATABASE_URL = 'sqlite:///./todosapp.db'
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
